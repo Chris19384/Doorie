@@ -1,0 +1,24 @@
+{
+  "name": "doorie",
+  "version": "1.0.0",
+  "description": "open your Garage via your smartphone!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chris19384/Doorie.git"
+  },
+  "author": "Chris",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chris19384/Doorie/issues"
+  },
+  "homepage": "https://github.com/Chris19384/Doorie#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "rpi-gpio": "^0.7.0"
+  }
+}

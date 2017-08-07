@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Doorie</string>
+    <string name="l_door">Linkes Tor</string>
+    <string name="r_door">Rechtes Tor</string>
+    <string name="to_open_close">Zum öffnen / schließen</string>
+    <string name="pls_enter_pin">Bitte 5-stellige Pin eingeben</string>
+    <string name="pls_activate_internet">Bitte WLAN oder mobile Daten aktivieren</string>
+</resources>
