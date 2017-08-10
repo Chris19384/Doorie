@@ -28,4 +28,21 @@ A: You don't. Use reed relays instead of mosfets if you can. I didn't have those
 
 ### Code quality ###
 This was a 1-weekend project, so there's probably a whole lot to improve here.  
-Feel free to contribute in any way :)  
+Feel free to contribute in any way :)
+
+
+
+### ToDo ###
+
+#### backend: ####
+- enhance logger (log ips and request parameters)
+- secure passwords (hash)
+
+#### android: ####
+- disable and reenable buttons
+- fix log colors
+- implement settings activity
+
+#### general: ####
+- document security measures such as secret.js and Secret.java
+- "Run this" section in here with explanations on how to set this up

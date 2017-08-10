@@ -6,4 +6,6 @@
     <string name="to_open_close">Zum öffnen / schließen</string>
     <string name="pls_enter_pin">Bitte 5-stellige Pin eingeben</string>
     <string name="pls_activate_internet">Bitte WLAN oder mobile Daten aktivieren</string>
+    <string name="show_log">Historie zeigen</string>
+    <string name="log">Historie:</string>
 </resources>

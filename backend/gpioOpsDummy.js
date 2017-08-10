@@ -1,5 +1,7 @@
 var canAccessGpio = true;
 
+console.log("Info: Using gpioOpsDummy!");
+
 function wait2Seconds(cb) {
 	setTimeout(() => {
 		cb(null, "OK");

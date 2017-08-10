@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:background="@color/colorClouds"
@@ -57,31 +58,32 @@
         android:typeface="serif" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tv_pls_wifi_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pls_activate_internet"
-        android:textSize="18sp"
-        android:layout_marginBottom="44dp"
-        android:layout_above="@+id/textView"
-        android:layout_centerHorizontal="true" />
+        android:textAlignment="viewStart"
+        android:textSize="13sp"
+        android:maxLines = "7"
+        android:scrollbars = "vertical"
+        android:layout_below="@+id/tv_to_open_close"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/tv_to_open_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:text="@string/to_open_close" />
-
-    <Button
-        android:id="@+id/showlog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView3"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="22dp"
-        android:text="Show Log" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/l"
+        android:layout_marginTop="43dp"
+        android:text="@string/to_open_close"
+        android:textSize="10sp" />
 
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package chris.me.doorie;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.content.res.Resources;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -31,6 +34,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -38,11 +43,23 @@ import static chris.me.doorie.Secret.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    Resources res;
+
     Button l;
     Button r;
-    Button showlog;
     EditText editPin;
     String currentPin = "";
+
+    TextView tv_to_open_close;
+    TextView tv_pls_wifi_log;
+
+    boolean openedLog = false;
+    List<String> logLines = new ArrayList<>();
+    //StringBuilder logHtml = new StringBuilder();
+
+    // dialog currently open
+    Dialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +67,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Context c = this;
-
-
-
+        res = getResources();
 
         //
         // TODO fix button visibility
@@ -60,60 +75,64 @@ public class MainActivity extends AppCompatActivity {
 
         l = (Button) findViewById(R.id.l);
         r = (Button) findViewById(R.id.r);
-        showlog = (Button) findViewById(R.id.showlog);
         editPin = (EditText) findViewById(R.id.editPin);
+        tv_to_open_close = (TextView) findViewById(R.id.tv_to_open_close);
+        tv_pls_wifi_log = (TextView) findViewById(R.id.tv_pls_wifi_log);
+        tv_pls_wifi_log.setMovementMethod(new ScrollingMovementMethod());
 
-        l.setOnClickListener((event) -> {
-            Toast.makeText(this, "Linkes Tor öffnen / schließen...", Toast.LENGTH_SHORT).show();
-            MyTask m = new MyTask(new Callback() {
-                @Override
-                public void onResult(String result) {
-                    setButtonsState(true);
-                }
+        l.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                appendLog("! " + r(R.string.l_door));
+                MyTask m = new MyTask(new Callback() {
+                    @Override
+                    public void onResult(String result) {
+                        setButtonsState(true);
+                        hideLoadingSpinner();
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    setButtonsState(true);
-                    Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            m.execute("r", currentPin, "");
+                    @Override
+                    public void onError(Exception e) {
+                        setButtonsState(true);
+                        hideLoadingSpinner();
+                    }
+
+                    @Override
+                    public void log(String s) {
+                        appendLog(s);
+                    }
+                });
+                m.execute("r", currentPin, "");
+                showLoadingSpinner();
+            }
         });
 
-        r.setOnClickListener((event) -> {
-            Toast.makeText(this, "Rechtes Tor öffnen / schließen...", Toast.LENGTH_SHORT).show();
-            MyTask m = new MyTask(new Callback() {
-                @Override
-                public void onResult(String result) {
-                    setButtonsState(true);
-                }
+        r.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                appendLog("! " + r(R.string.r_door));
+                MyTask m = new MyTask(new Callback() {
+                    @Override
+                    public void onResult(String result) {
+                        setButtonsState(true);
+                        hideLoadingSpinner();
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    setButtonsState(true);
-                    Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            m.execute("l", currentPin, "");
+                    @Override
+                    public void onError(Exception e) {
+                        setButtonsState(true);
+                        hideLoadingSpinner();
+                    }
+
+                    @Override
+                    public void log(String s) {
+                        appendLog(s);
+                    }
+                });
+                m.execute("l", currentPin, "");
+                showLoadingSpinner();
+            }
         });
-
-        showlog.setOnClickListener((event) -> {
-            MyTask m = new MyTask(new Callback() {
-                @Override
-                public void onResult(String responseLog) {
-                    setButtonsState(true);
-                    showDialogLog(responseLog);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    setButtonsState(true);
-                    Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            m.execute("l", currentPin, "fetchLog");
-        });
-
 
         editPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -152,34 +171,79 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.menu_settings) {
-            Intent i = new Intent(this, SettingsActivity.class);
-            startActivity(i);
+        Context c = this;
+        if (id == R.id.menu_showlog) {
+            appendLog("! " + r(R.string.show_log));
+            MyTask m = new MyTask(new Callback() {
+                @Override
+                public void onResult(String responseLog) {
+                    setButtonsState(true);
+                    showDialogLog(responseLog);
+                    hideLoadingSpinner();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    setButtonsState(true);
+                    hideLoadingSpinner();
+                }
+
+                @Override
+                public void log(String s) {
+                    appendLog(s);
+                }
+            });
+            m.execute("l", currentPin, "fetchLog");
+            showLoadingSpinner();
+        } else if(id == R.id.menu_settings) {
+            //Intent i = new Intent(this, SettingsActivity.class);
+            //startActivity(i);
+            Toast.makeText(this, "NOT IMPLEMENTED", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
 
     }
 
+    /**
+     * helper method to get a string resource
+     * @param id
+     * @return
+     */
+    public String r(int id) {
+        return res.getString(id);
+    }
+
     public void showDialogLog(String str) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Access Log:");
-
-
         TextView t = new TextView(this);
-
         t.setMovementMethod(new ScrollingMovementMethod());
         t.setText(str);
         builder.setView(t);
-
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
-
         builder.show();
+    }
+
+    public void showLoadingSpinner() {
+        // custom dialog
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.loading);
+        dialog.setTitle("Loading...");
+        dialog.show();
+    }
+
+    public void hideLoadingSpinner() {
+        if(dialog != null) {
+            dialog.dismiss();
+        } else {
+            Log.d("Doorie", "hideLoadingSpinner() called but no dialog is open!");
+        }
     }
 
     /**
@@ -189,7 +253,28 @@ public class MainActivity extends AppCompatActivity {
     public void setButtonsState(boolean active) {
         l.setEnabled(active);
         r.setEnabled(active);
-        showlog.setEnabled(active);
+    }
+
+    /**
+     * append to log textview
+     * @param s
+     */
+    private void appendLog(String s) {
+        if(!openedLog) {
+            tv_to_open_close.setText(r(R.string.log));
+            openedLog = true;
+        }
+
+        // add to log
+        logLines.add(Html.fromHtml(s).toString());
+
+        // render tv
+        StringBuilder sb = new StringBuilder(2048);
+        for(String str : logLines) {
+            sb.append(str);
+            sb.append("\r\n");
+        }
+        tv_pls_wifi_log.setText(sb.toString());
     }
 }
 
@@ -231,7 +316,7 @@ class MyTask extends AsyncTask<String, Void, Void> {
                         "application/x-www-form-urlencoded");
                 con.setRequestMethod("POST");
                 OutputStreamWriter post = new OutputStreamWriter(con.getOutputStream());
-                post.write("key=" + Secret.PASSWORD + currentPin);
+                post.write("key=" + PASSWORD + currentPin);
                 post.flush();
                 post.close();
                 // get respone
@@ -267,7 +352,7 @@ class MyTask extends AsyncTask<String, Void, Void> {
             return null;
         }
 
-        HttpsURLConnection con = null;
+        HttpsURLConnection con;
         try {
             con = (HttpsURLConnection) url.openConnection();
             con.setConnectTimeout(CONNECTION_TIMEOUT);
@@ -314,6 +399,7 @@ class MyTask extends AsyncTask<String, Void, Void> {
             }
             br.close();
             Log.i("Doorie", "Request answer: \n" + response.toString());
+            publishProgress();
         } catch( Exception e ) {
             setError(e);
             e.printStackTrace();
@@ -328,8 +414,10 @@ class MyTask extends AsyncTask<String, Void, Void> {
         super.onProgressUpdate(values);
         if(!isError) {
             handler.onResult(result);
+            handler.log("<font color=#27ae60> -> OK!</font>");
         } else {
             handler.onError(exception);
+            handler.log("<font color=#c0392b> -> ERR, " + exception.getMessage() + "</font>");
         }
     }
 

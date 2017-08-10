@@ -12,6 +12,7 @@ const async = require('async');
 // pin 16 (GPIO23) -> left Door
 // pin 18 (GPIO24) -> right Door
 
+console.log("Info: Using gpioOpsReal!");
 gpioInit();
 
 

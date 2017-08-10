@@ -79,4 +79,6 @@
     <string name="to_open_close">To open / close</string>
     <string name="pls_enter_pin">Please enter 5-digit pin</string>
     <string name="pls_activate_internet">Please enable WiFi or mobile Internet!</string>
+    <string name="show_log">Show Log</string>
+    <string name="log">Log:</string>
 </resources>
