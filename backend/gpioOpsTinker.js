@@ -1,34 +1,55 @@
-const gpio = require('rpi-gpio');
 const async = require('async');
+var exec = require('child_process').exec;
+
+
+
 
 
 // NOTE:
-// name pins by their raspberry pi pinout image!
-// e.g. 7 for GPIO04!
+// this file should only be used with 
+//   Asus Tinker Board
+// and a recent Debian OS
 
 
-// pins now set:
-// pin 31 (GPIO06) -> POWER 3.3V
-// pin 16 (GPIO23) -> left Door
-// pin 18 (GPIO24) -> right Door
+// constants
+const OUTPUT  = 'out';
+const HIGH    =     1;
+const LOW     =     0;
 
-console.log("Info: Using gpioOpsReal!");
+// wiringPi pins:
+var pin_power = 22;     // sys pin 31 (GPIO06)   ->   POWER 3.3V
+var pin_left  =  4;     // sys pin 16 (GPIO23)   ->   left Door
+var pin_right =  5;     // sys pin 18 (GPIO24)   ->   right Door
+
+
+console.log("Info: Using gpioOpsTinker!");
 gpioInit();
 
 
 //  gpio state,
 // true when interacting is allowed
-// false when gpio is already used
+// false when gpio is already in use
 var canAccessGpio = true;
+
+
+function pinMode(pin, val) {
+	exec("gpio mode " + pin + " " + val);
+}
+
+function digitalWrite(pin, val) {
+	exec("gpio write " + pin + " " + val);
+}
 
 
 // call this before invoking openDoor() or closeDoor()
 function gpioInit() {
-	gpio.setup(31, gpio.DIR_OUT, () => {
+	pinMode(pin_power, OUTPUT);
+	pinMode(pin_left, OUTPUT);
+	pinMode(pin_right, OUTPUT);
+
+	wait200Milliseconds(() => {
 		powerCircuitOFF(() => {});
 	});
-	gpio.setup(16, gpio.DIR_OUT);
-	gpio.setup(18, gpio.DIR_OUT);
 }
 
 function wait2Seconds(cb) {
@@ -46,72 +67,36 @@ function wait200Milliseconds(cb) {
 }
 
 function powerCircuitON(cb) {
-	gpio.write(31, true, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Circuit Power 3.3V -> ON");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_power, HIGH);
+	cb(null, "OK");
 }
 
 function powerCircuitOFF(cb) {
-	gpio.write(31, false, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Circuit Power 3.3V -> OFF");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_power, LOW);
+	cb(null, "OK");
 }
 
 
 function setLeftDoorHigh(cb) {
-	gpio.write(16, true, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Left Door -> HIGH");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_left, HIGH);
+	cb(null, "OK");
 }
 
 function setLeftDoorLow(cb) {
-	gpio.write(16, false, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Left Door -> LOW");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_left, LOW);
+	cb(null, "OK");
 }
 
 
 
 function setRightDoorHigh(cb) {
-	gpio.write(18, true, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Right Door -> HIGH");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_right, HIGH);
+	cb(null, "OK");
 }
 
 function setRightDoorLow(cb) {
-	gpio.write(18, false, (err) => {
-        if(err) console.error(err);
-        else {
-        	console.log("Right Door -> LOW");
-        	cb(null, "OK");
-        	return;
-        }
-    });
+	digitalWrite(pin_right, LOW);
+	cb(null, "OK");
 }
 
 // sets HIGH for two seconds
@@ -152,6 +137,7 @@ function triggerRightDoor(cb) {
 		return;
 	});
 }
+
 
 module.exports.canAccessGpio = canAccessGpio;
 module.exports.triggerLeftDoor = triggerLeftDoor;

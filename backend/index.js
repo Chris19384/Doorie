@@ -10,8 +10,9 @@ var logger = require('./logger.js');
 // switch for testing
 ///
 
-// var gpioOps = require('./gpioOpsReal.js');
-var gpioOps = require('./gpioOpsDummy.js');
+// var gpioOps = require('./gpioOpsPi.js');
+ var gpioOps = require('./gpioOpsTinker.js');
+// var gpioOps = require('./gpioOpsDummy.js');
 
 
 
@@ -34,8 +35,8 @@ app.post("/doorie/action", (req, res) => {
 	var key = req.body.key;
 
 	// which door to use
-	// "0" for left door
-	// "1" for right one
+	// "l" for left door
+	// "r" for right one
 	var door = req.body.door;
 
 	// either "open" or "close"
